@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="UniversalShield - one shield for your digital life. Check suspicious messages, links, payments, calls and app permissions before you act.">
+  <title>UniversalShield</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/main.css">
+  <script type="module" src="/js/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#app">Skip to content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="#/" aria-label="UniversalShield home">
+        <img src="/assets/logo.svg" alt="" width="30" height="30">
+        <span>UniversalShield<small>One shield for your digital life</small></span>
+      </a>
+      <button class="btn btn-ghost btn-sm nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav">Menu</button>
+      <nav class="nav" id="nav" aria-label="Main"></nav>
+    </div>
+  </header>
+  <main id="app" tabindex="-1" aria-live="polite">
+    <div class="state"><div class="spinner" aria-hidden="true"></div>Loading UniversalShield…</div>
+  </main>
+  <footer class="site-footer">
+    <div class="inner">
+      <span>UniversalShield 1.0.0 · Academic project · Results are risk assessments, not proof.</span>
+      <span><a href="#/about">Methodology &amp; limitations</a> · <a href="/swagger-ui.html">API docs</a></span>
+    </div>
+  </footer>
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+  <noscript><p style="padding:1rem">UniversalShield needs JavaScript enabled.</p></noscript>
+</body>
+</html>

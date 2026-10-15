@@ -1,0 +1,26 @@
+# Build output
+target/
+*.class
+
+# Local data and secrets
+data/devdb*
+.env
+*.log
+
+# Trained models are reproducible from data/samples (see docs/ML.md); keep the folder
+models/*
+!models/README.md
+
+# IDE / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Optional e2e tooling
+node_modules/
+package-lock.json
+
+# Packaged deliverable
+*.zip

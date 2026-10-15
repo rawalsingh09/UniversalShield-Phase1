@@ -1,0 +1,28 @@
+# Production template. Every value marked ${...} must be supplied as an environment variable.
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+
+server:
+  forward-headers-strategy: framework   # trust X-Forwarded-* from the hosting provider's proxy
+  servlet:
+    session:
+      cookie:
+        secure: ${COOKIE_SECURE:true}
+
+universalshield:
+  api-docs:
+    public: ${API_DOCS_PUBLIC:false}
+  security:
+    hash-secret: ${APP_HASH_SECRET}
+  demo:
+    seed: false
+
+logging:
+  level:
+    root: INFO
+    com.universalshield: INFO

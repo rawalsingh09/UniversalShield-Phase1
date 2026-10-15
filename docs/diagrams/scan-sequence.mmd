@@ -1,0 +1,38 @@
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant FE as Browser SPA
+    participant F as Security filters
+    participant C as ScanController
+    participant S as ScanService
+    participant H as ScanHistoryService
+    participant E as RiskEngine
+    participant D as Detectors
+    participant R as ScanRepository
+    participant DB as Database
+
+    U->>FE: Fill scanner form, press "Analyse"
+    FE->>FE: validation.js checks required fields and lengths
+    FE->>F: POST /api/scans (JSON, session cookie, X-XSRF-TOKEN)
+    F->>F: Rate limit, CSRF check, authenticate session
+    F->>C: Authenticated request
+    C->>C: @Valid ScanRequest (Jakarta Validation)
+    C->>S: create(user, request)
+    S->>S: validateShape (exactly one matching input)
+    S->>S: SubjectHasher hashes subject (recipient, domain or number)
+    S->>H: forUser(userId, category, subjectHash)
+    H->>R: user-scoped queries (subject hash, recent amounts)
+    R->>DB: SELECT ... WHERE user_id = ?
+    DB-->>H: prior scans
+    H-->>S: ScanHistory
+    S->>E: evaluate(FraudEvent with ScanHistory)
+    E->>D: analyze(event) for each available detector where appliesTo(event)
+    D-->>E: DetectorResult (indicators, notes, inputSufficient)
+    E->>E: strongest weight per group, noisy-OR, cap 95, level, evidence, recommendations, disclaimers
+    E-->>S: FraudResult
+    S->>S: InputSanitizer masks codes and card numbers in the excerpt
+    S->>R: save(Scan + ScanIndicators)
+    R->>DB: INSERT scans, scan_indicators (one transaction)
+    S-->>C: ScanResponse
+    C-->>FE: 201 Created + JSON
+    FE->>U: Render result page (score gauge, reasons, indicators, recommendations)

@@ -1,0 +1,16 @@
+# Automated tests: isolated in-memory database, no demo data, ML disabled for deterministic results.
+spring:
+  datasource:
+    url: jdbc:h2:mem:ustest;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ""
+
+universalshield:
+  demo:
+    seed: false
+  ml:
+    enabled: false
+  security:
+    hash-secret: test-only-secret
+    rate-limit:
+      enabled: false

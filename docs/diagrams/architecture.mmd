@@ -1,0 +1,33 @@
+flowchart LR
+    subgraph Browser["Browser (vanilla HTML/CSS/JS SPA)"]
+        UI["Pages: landing, auth, dashboard,<br/>scanner, result, history, settings, about"]
+        VAL["validation.js<br/>(client-side checks)"]
+        API_JS["api.js<br/>(fetch + CSRF header)"]
+        UI --> VAL --> API_JS
+    end
+
+    subgraph Server["Spring Boot application (Java 17)"]
+        direction TB
+        SEC["Security filter chain<br/>RateLimitFilter, CsrfCookieFilter,<br/>session auth, headers/CSP"]
+        CTRL["REST controllers<br/>api/, auth/, user/"]
+        SVC["Services<br/>ScanService, ScanHistoryService,<br/>InputSanitizer, DashboardService,<br/>ReportService, RetentionService"]
+        ENG["RiskEngine<br/>(RiskScorer + RecommendationCatalog)"]
+        subgraph DET["DetectionModule implementations"]
+            D1["MessageFraudDetector"]
+            D2["UrlRiskDetector"]
+            D3["TransactionFraudDetector"]
+            D4["CallFraudDetector"]
+            D5["AppPermissionDetector"]
+            D6["MlTextDetector (optional)"]
+        end
+        REP["Spring Data JPA repositories"]
+        SEC --> CTRL --> SVC --> ENG --> DET
+        SVC --> REP
+    end
+
+    DB[("PostgreSQL 16 (prod)<br/>H2 (dev/test)<br/>schema by Flyway")]
+    MODELS[["models/*.json<br/>(optional, local files)"]]
+
+    API_JS -- "HTTPS JSON + session cookie" --> SEC
+    REP --> DB
+    D6 -. reads at startup .-> MODELS

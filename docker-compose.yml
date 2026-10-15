@@ -1,0 +1,41 @@
+# Local production-like stack: PostgreSQL + UniversalShield.
+#   copy .env.example .env   (then edit the passwords/secret)
+#   docker compose up --build
+# App: http://localhost:8080
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-universalshield}
+      POSTGRES_USER: ${DB_USERNAME:-universalshield}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-universalshield} -d ${DB_NAME:-universalshield}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://db:5432/${DB_NAME:-universalshield}
+      DB_USERNAME: ${DB_USERNAME:-universalshield}
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      APP_HASH_SECRET: ${APP_HASH_SECRET:?Set APP_HASH_SECRET in .env}
+      # Local http://localhost has no TLS, so the session cookie cannot be Secure here.
+      # Behind HTTPS in real deployments leave COOKIE_SECURE unset (defaults to true).
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      API_DOCS_PUBLIC: ${API_DOCS_PUBLIC:-false}
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:

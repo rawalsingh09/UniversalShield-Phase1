@@ -1,0 +1,71 @@
+erDiagram
+    users ||--o| user_preferences : "has"
+    users ||--o{ scans : "owns"
+    scans ||--o{ scan_indicators : "contains"
+    users |o--o{ audit_events : "subject of"
+
+    users {
+        BIGINT id PK
+        VARCHAR email UK
+        VARCHAR display_name
+        VARCHAR password_hash "BCrypt"
+        VARCHAR role "USER or ADMIN"
+        BOOLEAN enabled
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+    user_preferences {
+        BIGINT user_id PK, FK
+        INTEGER retention_days "1..365"
+        BOOLEAN store_input_excerpts
+        VARCHAR default_category
+    }
+    scans {
+        BIGINT id PK
+        UUID public_id UK "exposed in API"
+        BIGINT user_id FK
+        VARCHAR category
+        INTEGER risk_score "0..100"
+        VARCHAR risk_level
+        VARCHAR evidence_strength
+        VARCHAR sources
+        VARCHAR ruleset_version
+        VARCHAR detector_versions
+        VARCHAR input_excerpt "masked, optional"
+        VARCHAR subject_hash "HMAC-SHA256"
+        NUMERIC amount
+        TEXT reasons "JSON list"
+        TEXT recommendations "JSON list"
+        TEXT notes "JSON list"
+        TEXT disclaimers "JSON list"
+        BOOLEAN demo
+        TIMESTAMPTZ created_at
+    }
+    scan_indicators {
+        BIGINT id PK
+        BIGINT scan_id FK
+        VARCHAR code
+        VARCHAR indicator_group
+        VARCHAR title
+        VARCHAR explanation
+        DOUBLE weight "0 < w <= 1"
+        VARCHAR detector_id
+        VARCHAR source
+        VARCHAR evidence "masked"
+    }
+    detector_metadata {
+        VARCHAR detector_id PK
+        VARCHAR display_name
+        VARCHAR version
+        VARCHAR categories
+        VARCHAR source_type
+        VARCHAR description
+    }
+    audit_events {
+        BIGINT id PK
+        BIGINT user_id FK "nullable"
+        VARCHAR event_type
+        VARCHAR detail
+        VARCHAR ip_hash
+        TIMESTAMPTZ created_at
+    }
